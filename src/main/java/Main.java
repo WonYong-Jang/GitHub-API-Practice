@@ -14,73 +14,10 @@ import java.util.Map;
 
 public class Main {
 
-    private static final int TOTAL_ISSUE = 2; // 여기서는 2회까지만 순회
-
     public static void main(String[] args) throws IOException {
 
-        // properties 파일로 token 관리
-        String path = "src/main/resources/application.properties";
-        GitHub github = GitHubBuilder.fromPropertyFile(path).build();
-
-        // 해당 repository 가져오기
-        GHRepository repository = github.getRepository("WonYong-Jang/Github-API-Practice");
-
-        // 모든 issue 객체 가져오기
-        List<GHIssue> issues = repository.getIssues(GHIssueState.ALL);
-
-        // 사용자가 각 Issue 별로 몇번 comment를 입력했는지
-        HashMap<GHUser, Boolean[]> map = new HashMap<>();
-
-        for(int i=0; i< issues.size(); i++) {
-
-            // 각 Issue 에 대한 comments 확인
-            List<GHIssueComment> comments = issues.get(i).getComments();
-
-            // 각 comment 확인
-            for(GHIssueComment comment : comments) {
-
-                GHUser user = comment.getUser();
-
-                Boolean[] attendance = new Boolean[TOTAL_ISSUE];;
-                if(map.containsKey(user)) {
-                    attendance = map.get(user);
-                }
-                attendance[i] = true;
-                map.put(user, attendance);
-
-            }
-        }
-
-        // 참여 횟수 구하기
-        NumOfParticipation(map);
-
-    }
-    public static void NumOfParticipation(HashMap<GHUser, Boolean[]> map) throws IOException {
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("### 스터디 현황\n");
-        sb.append("| 참여자 | 1주차 | 2주차 | 참석율\n");
-        sb.append("| --- | --- | --- | --- | \n");
-
-        for(Map.Entry<GHUser, Boolean[]> cur : map.entrySet()) {
-
-            int sum = 0;
-            Boolean[] attendance = cur.getValue();
-            GHUser user = cur.getKey();
-            sb.append("|"+user.getName()+"|");
-            for(int i =0; i < attendance.length; i++) {
-                if(attendance[i]) {
-                    sum++;
-                    sb.append(":white_check_mark:|");
-                }
-            }
-
-            String percent = String.format("%.2f", (double)(sum*100) / TOTAL_ISSUE);
-            sb.append( percent + "|");
-            sb.append("\n");
-
-        }
-
-        System.out.println(sb.toString());
+        GithubApi api = new GithubApi();
+        api.checkAttendance();
+        api.NumOfParticipation();
     }
 }
