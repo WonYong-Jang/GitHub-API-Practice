@@ -1,6 +1,5 @@
 import org.kohsuke.github.*;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +14,7 @@ import java.util.Map;
 
 public class Main {
 
-    private static final int TOTAL_ISSUE = 2;
+    private static final int TOTAL_ISSUE = 2; // 여기서는 2회까지만 순회
 
     public static void main(String[] args) throws IOException {
 
@@ -60,21 +59,26 @@ public class Main {
 
         StringBuilder sb = new StringBuilder();
         sb.append("### 스터디 현황\n");
-        sb.append("| 참여자 | 1주차 | 2주차 | \n");
-        sb.append("| --- | --- | --- |\n");
+        sb.append("| 참여자 | 1주차 | 2주차 | 참석율\n");
+        sb.append("| --- | --- | --- | --- | \n");
 
         for(Map.Entry<GHUser, Boolean[]> cur : map.entrySet()) {
 
+            int sum = 0;
             Boolean[] attendance = cur.getValue();
             GHUser user = cur.getKey();
             sb.append("|"+user.getName()+"|");
             for(int i =0; i < attendance.length; i++) {
                 if(attendance[i]) {
+                    sum++;
                     sb.append(":white_check_mark:|");
                 }
             }
-//            double result = (double)(cur.getValue()*100) / TOTAL_ISSUE;
-//            System.out.println(String.format("%.2f", result));
+
+            String percent = String.format("%.2f", (double)(sum*100) / TOTAL_ISSUE);
+            sb.append( percent + "|");
+            sb.append("\n");
+
         }
 
         System.out.println(sb.toString());
